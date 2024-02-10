@@ -1,0 +1,42 @@
+/* Footer.css */
+
+.footer {
+    background-color: black; /* Set your desired background color */
+    color: white; /* Set text color */
+    padding: 20px; /* Add padding for better spacing */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+  
+.foot-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+  
+  .company,
+  .follow {
+    text-align: center;
+  }
+  
+  .company-title,
+  .follow-title {
+    font-size: 20px;
+  }
+  
+  .company-links,
+  .follow-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .company-links li,
+  .follow-links li {
+    margin-bottom: 8px;
+  }
+
+  
+  
