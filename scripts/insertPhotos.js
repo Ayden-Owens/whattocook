@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { Recipe } = require('../models')
+const { Recipe } = require('../server/models')
 
 const recipeImages = {
   'Baked Chicken': 'baked_chicken.png',
