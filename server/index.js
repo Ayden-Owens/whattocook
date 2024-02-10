@@ -47,13 +47,13 @@ app.use('/recipe', recipeRouter)
 
 var PORT = process.env.PORT || 3000
 
-// // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, '../client/build')))
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')))
 
-// // Handle requests to the root path by sending the React app's index.html
-// app.get('/*', (req, res) => {
-//     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-// })
+// Handle requests to the root path by sending the React app's index.html
+app.get('/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+})
 
 // Forms
 const messagesFilePath = path.join(__dirname, 'messages.txt');
