@@ -329,7 +329,7 @@ const Profile = () => {
             )} 
           </div>
           <button className="save-button" type="button" onClick={fetchIngredientOptions}>
-            Save
+            Save Ingredient
           </button>
           {/* Ingredient Modal */}
           {showIngredientModal && (
