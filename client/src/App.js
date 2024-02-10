@@ -18,7 +18,7 @@ import RecipeGenerator from "./RecipeGenerator";
 function App() {
   return (
     <Router>
-      <div style={{ background: "sandybrown" }} className="App">
+      <div className="App">
         <Routes>
           <Route path="/login" Component={Login} />
           <Route path="/register" Component={Register} />

@@ -56,8 +56,8 @@ const Login = () => {
 
     const handleLogin = async () => {
 
-        // const API_BASE_URL = 'https://www.whattocook.cc'
-        const API = "http://localhost:3000"
+        const API = 'https://what-to-cook-35e9730f2916.herokuapp.com/'
+        // const API = "http://localhost:3000"
     
 
         if (!usernameLog || !passwordLog) {
@@ -87,21 +87,6 @@ const Login = () => {
         }
 
     }
-
-    
-
-    // useEffect(()=> {
-    //     Axios.get("http://localhost:3001/users/check-login")
-    //         .then((response) => {
-    //             if (response.data.loggedIn === true) {
-    //                 setLoginStatus(response.data.user.username)
-    //             }    
-    //     })
-    //     .catch((error) => {
-    //         console.error("Error checking login status:", error)
-    //         setLoginStatus("Error checking login status")
-    //     })
-    // }, [])
 
     return (
         <div className='body'>
