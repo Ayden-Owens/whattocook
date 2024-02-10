@@ -7,8 +7,6 @@ const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const fs = require('fs/promises');
 
-const port = 3000;
-
 dotenv.config()
 const path = require("path")
 
