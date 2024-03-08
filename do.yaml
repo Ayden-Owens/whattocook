@@ -4,7 +4,7 @@ region: nyc
 services:
   - name: frontend-service
     github:
-      repo: https://github.com/Ayden-Owens/What_To_Cook
+      repo: https://github.com/Ayden-Owens/whattocook
       branch: main
     source_dir: /client
     build_command: npm run build
@@ -15,7 +15,7 @@ services:
 
   - name: backend-service
     github:
-      repo: https://github.com/Ayden-Owens/What_To_Cook
+      repo: https://github.com/Ayden-Owens/whattocook
       branch: main
     source_dir: /server
     build_command: npm install
