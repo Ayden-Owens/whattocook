@@ -56,7 +56,7 @@
   
 .upload-modal {
     position: fixed;
-    top: 25px;
+    top: 0;
     left: 0;
     width: 100%;
     height: 100%;
@@ -164,13 +164,14 @@
 }
 
 .Profile-Page{
-    background-color: white;
+    background-color: tan;
 }
 
 .middle-section,
 .top-section {
     padding: 10px;
     font-family: 'Brush Script Std';
+    flex-direction: row; /* Add this line */
 }
 
 .middle-section{
@@ -179,6 +180,69 @@
     flex-direction: row; /* Add this line */
     margin-top: 10px;
     font-family: 'Brush Script MT', 'Brush Script Std', cursive;
+}
+
+.top-section{
+    display: flex;
+    justify-content: space-between;
+}
+
+.Right-Panel{
+    height: 450px;
+    width: 525px;
+    display: flex;
+    justify-content: space-between; /* Add space between Profile-Card and Meal-of-Week */
+    padding: 20px;
+}
+
+/* Favorite Section */
+.recipe-list{
+    display: flex;
+    justify-content: space-between;
+    overflow-x: auto;
+    height: 350px;
+    width: 500px;
+    padding: 10px;
+}
+
+.favorite-recipe{
+    background-color: lightgrey;
+    height: 300px;
+    width: 250px;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+.fav_recipe_image {
+    width: 100%; /* Make the image fill its container */
+    width: 250px;
+    height: 80%; /* Adjust the height as needed */
+    object-fit: cover; /* Ensure the image covers the container without stretching */
+    border-radius: 10px; /* Add border-radius for rounded corners */
+}
+
+.recipe-info{
+    display: flex;
+    align-items: center;
+}
+
+.recipe-info p{
+    font-size: 15px;
+    margin-left: 5px;
+    align-self: center;
+    width: 200px;
+    height: 40px;
+}
+
+.bookmark_icon{
+    margin-left: 16px;
+    width: 0;
+    height: 0;
+    border-top: 14px solid blue;
+    border-right: 7.5px solid blue;
+    border-bottom: 7.5px solid transparent;
+    border-left: 7.5px solid blue;
+    cursor: pointer;
 }
 
 .R-Panel{
@@ -211,7 +275,7 @@
 } */
 
 /* vapor */
-.vapor1 {
+/* .vapor1 {
     position: absolute;
     top: 20px;
     left: 475px;
@@ -255,6 +319,7 @@
     opacity: 0;
     filter: blur(8px);
     animation-delay: calc(var(--i) * -0.5s);
+    z-index: 1;
 }
 
 .vapor2 span{
@@ -270,6 +335,7 @@
     opacity: 0;
     filter: blur(8px);
     animation-delay: calc(var(--i) * -0.5s);
+    z-index: 1;
 }
 
 .vapor3 span {
@@ -285,6 +351,7 @@
     opacity: 0;
     filter: blur(8px);
     animation-delay: calc(var(--i) * -0.5s);
+    z-index: 1;
 }
 
 @keyframes animate {
@@ -305,29 +372,7 @@
     100% {
         transform: translateY(300px) scaleX(10);
     }
-}
-
-/* mist animation */
-.cold-mist{
-    background-image: url('../public/images/profile/cold_mist.png');
-    background-repeat: repeat-y;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    transform: rotate(90deg);
-    animation: animateOne 5s infinite linear;
-}
-
-@keyframes animateOne{
-    0% {
-      top: 0px; /* Start position */
-    }
-    100% {
-      top: 100%; /* End position */
-    }
-}
+} */
 
 .ingredient-item li{
     background-color: rgba(209, 209, 209, 0.651);
@@ -338,7 +383,8 @@
     border-radius: 10px;
     list-style-type: none;
     font-weight: 100;
-    margin-bottom: 10px
+    margin-bottom: 10px;
+    z-index: 2;
 }
 
 .ingredient-item{
@@ -347,6 +393,7 @@
     display: flex;
     flex-wrap: wrap; 
     gap: 25px;  
+    z-index: 2;
 }
 
 .add-items button,
@@ -354,6 +401,7 @@
     font-family: 'Brush Script MT', 'Brush Script Std', cursive;
     border-radius: 5px;
     width: 150px;
+    z-index: 2;
 }
 
 .add-items h3{  
@@ -450,4 +498,16 @@
     height: 250px;
     align-items: center;
     justify-content: center;
+    text-align: center;
+
+}
+
+.bottom-fridge ul{
+    list-style: none;
+}
+
+.error-message{
+    color: red;
+    font-size: 40px;
+    margin-top: 20px;
 }

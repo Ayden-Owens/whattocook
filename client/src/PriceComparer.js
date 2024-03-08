@@ -4,13 +4,15 @@ import jsPDF from 'jspdf';
 import SearchBar from './SearchBarProducts';
 import Header from './Header';
 import Footer from './Footer';
+import withTokenExpirationCheck from "./withTokenExpirationCheck";
 import './PriceComparer.css';
 
-const PriceComparer = () => {
+const PriceComparer = ({ ItemToSearch }) => {
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [searchedItemName, setSearchedItemName] = useState('');
+  const [isSearchResultEmpty, setIsSearchResultEmpty] = useState(false);
 
   const handleClearAll = () => {
     setSelectedItems([]);
@@ -19,16 +21,29 @@ const PriceComparer = () => {
   const handleSearchResults = (searchResults, itemName) => {
     setSearchedItemName(itemName);
     const filteredItems = searchResults.filter(item => item.price && item.price[0] !== null);
-    setItems(filteredItems);
+    if (filteredItems.length === 0) {
+      setIsSearchResultEmpty(true);
+    } else {
+      setIsSearchResultEmpty(false);
+      setItems(filteredItems);
+    }
   };
 
-  const handleItemClick = (productId) => {
+  const handleItemClick = (productId, event) => {
+    if (event.target.tagName.toLowerCase() === 'a') {
+      return;
+    }
+
     const selectedItem = items.find(item => item.productId === productId);
     selectedItem.itemName = searchedItemName || 'N/A';
     setSelectedItems([...selectedItems, selectedItem]);
   };
 
-  const handleRemoveItem = (productId) => {
+  const handleRemoveItem = (productId, event) => {
+    if (event.target.tagName.toLowerCase() === 'a') {
+      return;
+    }
+
     const updatedSelectedItems = selectedItems.filter(item => item.productId !== productId);
     setSelectedItems(updatedSelectedItems);
   };
@@ -62,16 +77,21 @@ const PriceComparer = () => {
   }, [selectedItems]);
 
   return (
-    <div>
+    <div style={{backgroundColor: 'tan'}}>
       <Header />
       <div>
-        <h1>Price Compararer</h1>
-        <SearchBar onSearchResults={handleSearchResults} />
+        <h1>Price Comparator</h1>
+        <SearchBar onSearchResults={handleSearchResults} itemFromRecipeGenerator={ItemToSearch}/>
         <div className="search-section">
           <h2>Search Results</h2>
           <div>
+            {isSearchResultEmpty && (
+              <div className="text-bubble">
+                <p>Oops! That is not an item in our data base. Please try another search term.</p>
+              </div>
+            )}
             {items.map(item => (
-              <div key={item.productId} onClick={() => handleItemClick(item.productId)} className="search-item">
+              <div key={item.productId} onClick={(event) => handleItemClick(item.productId, event)} className="search-item">
                 <h2><a href={`https://www.kroger.com/search?query=${item.productId}&searchType=default_search`} target="_blank" rel="noopener noreferrer">{item.brand || 'Kroger'}</a></h2>
                 {item.price && item.price[0] !== null && (
                   <>
@@ -83,11 +103,11 @@ const PriceComparer = () => {
             ))}
           </div>
         </div>
-        <div>
+        <div className="selected-section">
           <h2>Selected Items</h2>
           <div>
             {selectedItems.map(item => (
-              <div key={item.productId} onClick={() => handleRemoveItem(item.productId)} className="search-item">
+              <div key={item.productId} onClick={(event) => handleRemoveItem(item.productId, event)} className="selected-item">
                 <h2><a href={`https://www.kroger.com/search?query=${item.productId}&searchType=default_search`} target="_blank" rel="noopener noreferrer">{item.brand || 'Kroger'}</a></h2>
                 {item.price && item.price[0] !== null && (
                   <>
@@ -100,8 +120,8 @@ const PriceComparer = () => {
             ))}
           </div>
           <h2>Total Price: ${totalPrice}</h2>
-          <button onClick={generatePDF}>Generate PDF</button>
-          <button onClick={handleClearAll}>Clear All</button>
+          <button type="button" onClick={generatePDF}>Generate PDF</button>
+          <button type="button" onClick={handleClearAll}>Clear All</button>
         </div>
       </div>
       <Footer />
@@ -109,4 +129,4 @@ const PriceComparer = () => {
   );
 };
 
-export default PriceComparer;
+export default withTokenExpirationCheck(PriceComparer);

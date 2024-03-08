@@ -19,6 +19,7 @@ const saltRounds = 10;
 const fs = require("fs");
 
 const multer = require("multer");
+const { error } = require("console");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -70,7 +71,7 @@ router.post("/login", async (req, res) => {
     const foundUser = await Users.findOne({
       where: { username },
     });
-
+    
     if (foundUser) {
       const passwordMatch = await bcrypt.compare(password, foundUser.password);
       if (passwordMatch) {
@@ -132,7 +133,7 @@ router.get("/profile", authenticate, async (req, res) => {
 router.get("/ingredient_options", async (req, res) => {
   try {
     const { query } = req.query
-    console.log(" user input: " + query)
+    console.log("query"+query)
 
     // Query the database for ingredients that match the provided query
     const matchingIngredients = await Ingredient.findAll({
@@ -144,10 +145,23 @@ router.get("/ingredient_options", async (req, res) => {
       attributes: ["name"], 
     });
 
-    // Extract the names of matching ingredients from the query result
-    const ingredientOptions = matchingIngredients.map((ingredient) => ingredient.name);
+
     
-    res.status(200).json({ ingredientOptions });
+    if (matchingIngredients == 0){
+      res.status(404).json({ error: "Ingredient not found in our recipes." });
+ 
+    }
+    else if (query == ""){
+      
+      res.status(404).json({ error: "input is empty" })
+    }
+    else {
+      // Extract the names of matching ingredients from the query result
+      const ingredientOptions = matchingIngredients.map((ingredient) => ingredient.name);
+      
+      res.status(200).json({ ingredientOptions });
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -172,32 +186,30 @@ router.post("/profile_ingredient_list", authenticate, async (req, res) => {
     // if true
     if (ingredient) {
       console.log("Ingredient:", ingredient.name);
-    } else {
+          // Check if the ingredient already exists in the user's profile
+      const [userProfile, created] = await FridgeIngredient.findOrCreate({
+        where: {
+          user_id: req.userId,
+          ingredient_id: ingredient.id,
+        },
+        defaults: {
+          quantity: quantity,
+        },
+      });
+      // handle case if the user profile already has the ingrendient
+      if (!created) {
+        //console.log('User already has this ingredient!')
+        await userProfile.update({ quantity: quantity });
+      }
+
+      res.json({ message: "Fridge updated successfully" });
+    } 
+    else {
       console.error("Ingredient not found for: ", name);
       res.status(404).json({ error: "Ingredient not found." });
-      return;
     }
-
-    // Check if the ingredient already exists in the user's profile
-    const [userProfile, created] = await FridgeIngredient.findOrCreate({
-      where: {
-        user_id: req.userId,
-        ingredient_id: ingredient.id,
-      },
-      defaults: {
-        quantity: quantity,
-      },
-    });
-
-    // handle case if the user profile already has the ingrendient
-    if (!created) {
-      //console.log('User already has this ingredient!')
-      await userProfile.update({ quantity: quantity });
-    }
-
-    res.json({ message: "Fridge updated successfully" });
-  } catch (error) {
-    console.error(error);
+  }
+    catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -419,7 +431,7 @@ router.post("/upload_profile_picture", upload.single("profilePicture"), authenti
 router.post("/bookmark_recipe", authenticate, async (req, res) => {
   try{
     const userId = req.userId;
-    const { recipeId } = req.body;
+    const recipeId = req.body.data.recipeID;
 
     // Create a new entry in the FavRecipes table
     await FavRecipes.create({
@@ -437,7 +449,7 @@ router.post("/bookmark_recipe", authenticate, async (req, res) => {
 router.post("/unbookmark_recipe", authenticate, async (req, res) => {
   try {
     const userId = req.userId;
-    const { recipeId } = req.body;
+    const recipeId = req.body.data.recipeID;
 
     // Find and delete the corresponding entry in the FavRecipes table
     await FavRecipes.destroy({
@@ -454,5 +466,73 @@ router.post("/unbookmark_recipe", authenticate, async (req, res) => {
   }
 });
 
+router.delete("/unbookmark", authenticate, async (req, res) => {
+  try {
+    
+    const userId = req.userId;
+    const recipeId = req.body.recipeID;
+    
+    // Find and delete the corresponding entry in the FavRecipes table
+    await FavRecipes.destroy({
+      where: {
+        userId: userId,
+        recipeId: recipeId,
+      },
+    });
+
+    res.status(200).json({ message: 'Recipe removed from favorites successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get("/favorite_recipe", authenticate, async (req, res) => {
+  try{
+    const userId = req.userId;
+    const favRecipes = await FavRecipes.findAll({
+      where: { userId },
+      include: [{ model: Recipe, attributes: ["id", "title", "image"] }],
+    });
+
+    const favoriteRecipes = favRecipes.map((favRecipe) => {
+      const { id, title, image } = favRecipe.Recipe;
+      return {
+        id,
+        title,
+        image: image ? `http://localhost:3000/recipe_images/${image}` : null,
+      };
+    });
+
+    res.status(200).json({ favoriteRecipes });
+  }
+  catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+router.post("/isBookmarked", authenticate, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const recipeId = req.body.data.recipeID;
+
+    const [bookmark, exists] = await FavRecipes.findAll({
+      where: { userId: userId , recipeId: recipeId}
+    });
+    // if the bookmark doesn't exist, we return an empty Json
+    if(bookmark === undefined){
+      const nullJson = {full:0};
+      res.status(200).json(nullJson);
+    } else { // Else, we return a json 
+      const somethingjson = {full:1};
+      res.status(200).json(somethingjson);
+    }
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 module.exports = router;

@@ -68,7 +68,7 @@ const Register = () => {
         { withCredentials: true }
       );
       console.log(response.data);
-      navigate('/Login');
+      navigate('/');
     } catch (error) {
       console.error(error);
       setError(error.response?.data.error || 'Registration failed. Please try again.');
@@ -77,18 +77,18 @@ const Register = () => {
 
     return (
       <div className='body'>
-        <div className='container'>
+        <div className='login_container'>
           <div className='carousel'>
             <div className='carousel-item'>
-              <img src="/images/login1.png" alt=""/>
+              <img src="/images/login/login1.png" alt=""/>
               <div className="carousel-text">Enter your ingredients</div>
             </div>
             <div className='carousel-item'>
-              <img src="/images/login2.png" alt=""/>
+              <img src="/images/login/login2.png" alt=""/>
               <div className="carousel-text">Find a recipe and start cooking</div>
             </div>
             <div className='carousel-item'>
-              <img src="/images/login3.png" alt=""/>
+              <img src="/images/login/login3.png" alt=""/>
               <div className="carousel-text">Then start eating your delicious meal</div>
             </div>
             <div className='carousel_nav'>
@@ -125,7 +125,7 @@ const Register = () => {
               />
             <button className="register-button" onClick={handleRegistration}>Register</button>      
             <div className='login'>
-              <Link to="/Login">
+              <Link to="/">
                 <button> Login </button>
               </Link>
             </div>
@@ -136,4 +136,4 @@ const Register = () => {
     )
 }
 
-export default Register
+export default Register;

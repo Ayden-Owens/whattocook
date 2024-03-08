@@ -19,6 +19,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true, // allowNull: false if every user must have a profile picture
         },
     });
-
+    
     return Users;
 };

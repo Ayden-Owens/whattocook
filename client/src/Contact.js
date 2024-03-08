@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from './Header';
 import Footer from './Footer';
+import withTokenExpirationCheck from "./withTokenExpirationCheck";
 
 function Contact() {
   const [name, setName] = useState('');
@@ -12,7 +13,7 @@ function Contact() {
 
   const submitForm = async () => {
     try {
-      await fetch('http://localhost:3000/contactus', {
+      await fetch('http://localhost3000/contactus', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,10 +34,10 @@ function Contact() {
   };
 
   return (
-    <div>
+    <div style={{backgroundColor: 'tan'}}>
     <Header />
     <div>
-    <h1> Send Us an Email</h1>
+    <h1> Contact Us!</h1>
     <form>
         <label htmlFor="name">Name:</label>
         <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -72,4 +73,4 @@ function Contact() {
 //     );
 // }
 
-export default Contact;
+export default withTokenExpirationCheck(Contact);

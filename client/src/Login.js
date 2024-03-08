@@ -56,8 +56,8 @@ const Login = () => {
 
     const handleLogin = async () => {
 
-        const API = 'https://what-to-cook-35e9730f2916.herokuapp.com/'
-        // const API = "http://localhost:3000"
+        // const API = 'https://whattocookapp-ed9fe9a2a3d4.herokuapp.com'
+        const API = "http://localhost:3000"
     
 
         if (!usernameLog || !passwordLog) {
@@ -88,20 +88,33 @@ const Login = () => {
 
     }
 
+    // useEffect(()=> {
+    //     Axios.get("http://localhost:3001/users/check-login")
+    //         .then((response) => {
+    //             if (response.data.loggedIn === true) {
+    //                 setLoginStatus(response.data.user.username)
+    //             }    
+    //     })
+    //     .catch((error) => {
+    //         console.error("Error checking login status:", error)
+    //         setLoginStatus("Error checking login status")
+    //     })
+    // }, [])
+
     return (
         <div className='body'>
-            <div className='container'>
+            <div className='login_container'>
                 <div className='carousel'>
                     <div className='carousel-item'>
-                        <img src="/images/login1.png" alt=""/>
+                        <img src="/images/login/login1.png" alt=""/>
                         <div className="carousel-text">Enter your ingredients</div>
                     </div>
                     <div className='carousel-item'>
-                        <img src="/images/login2.png" alt=""/>
+                        <img src="/images/login/login2.png" alt=""/>
                         <div className="carousel-text">Find a recipe and start cooking</div>
                     </div>
                     <div className='carousel-item'>
-                        <img src="/images/login3.png" alt=""/>
+                        <img src="/images/login/login3.png" alt=""/>
                         <div className="carousel-text">Then start eating your delicious meal</div>
                     </div>
                     <div className='carousel_nav'>
@@ -133,7 +146,6 @@ const Login = () => {
                             }}
                         />
                     <button onClick={handleLogin}>Login</button>
-                    <label htmlFor="or">OR</label>
                     <div className="register"> 
                         <Link to="/register">
                             <button> Sign Up </button>

@@ -1,8 +1,8 @@
 // Justin on the search!
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const SearchBar = ({ onSearchResults }) => {
+const SearchBar = ({ onSearchResults, itemFromRecipeGenerator }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearch = async () => {
@@ -24,6 +24,13 @@ const SearchBar = ({ onSearchResults }) => {
     }
   };
 
+  useEffect(() => {
+    if(itemFromRecipeGenerator != null) {
+      setSearchTerm(itemFromRecipeGenerator); // Fetch data when component mounts
+
+    }
+  }, []);
+
   return (
     <div>
       <input
@@ -32,7 +39,8 @@ const SearchBar = ({ onSearchResults }) => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <button onClick={handleSearch}>Search</button>
+      <button type="button" onClick={handleSearch} button={true.toString()}>Search</button>
+      
     </div>
   );
 };

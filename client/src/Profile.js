@@ -3,9 +3,12 @@ import Axios from "axios";
 import Cookies from "js-cookie";
 import Footer from "./Footer";
 import Header from "./Header";
+import withTokenExpirationCheck from "./withTokenExpirationCheck";
 import "./Profile.css";
+import { useNavigate} from "react-router-dom";
 
-const Profile = () => {
+
+const Profile = ( { onRecipeSelect } ) => {
   const [userData, setUserData] = useState({});
   const [savedIngredients, setSavedIngredients] = useState([]);
   const [ingredientName, setIngredientName] = useState("");
@@ -15,14 +18,33 @@ const Profile = () => {
   const [showIngredientModal, setShowIngredientModal] = useState(false); // State to control the ingredient modal
   const [selectedIngredient, setSelectedIngredient] = useState(""); // State to store the selected ingredient
 
+  //Profile Photo Variables
   const [selectedFile, setSelectedFile] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [profilePictureURL, setProfilePictureURL] = useState("");
 
+  //Recipe of the Week
   const [recipeOfTheWeek, setRecipeOfTheWeek] = useState(null);
 
-  const API = "http://localhost:3000"
+  //Favorite Recipes
+  const [favoriteRecipes, setFavoriteRecipes] = useState([])
+
+  const navigate = useNavigate()
+
+  //Error Vars
+  const [error, setError] = useState(null);
+  const [quantityError, setQuantityError] = useState("");
+
+  const API = 'http://localhost:3000'
+  // const API = "http://localhost:3000"
+
+  const handleRecipeToSearchBar = (recipeTitle) => {
+    if (onRecipeSelect) {
+      onRecipeSelect(recipeTitle);
+      navigate("/RecipeGenerator");
+    }
+  }
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -40,7 +62,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchRecipeOfTheWeek = async () => {
       try {
-        const response = await Axios.get(API+'/recipe/random_recipe');
+        const response = await Axios.get(API+'/recipe/recipe_of_the_week');
         setRecipeOfTheWeek(response.data);
       } catch (error) {
         console.error(error);
@@ -48,6 +70,10 @@ const Profile = () => {
     };
 
     fetchRecipeOfTheWeek()
+  }, [])
+
+  useEffect(() => {
+    getUserData();
   }, [])
 
   // Fetch email and username
@@ -65,11 +91,12 @@ const Profile = () => {
       .then((response) => {
         console.log("Profile response:", response.data);
         setUserData({
+          id: response.data.id,
           username: response.data.username,
           email: response.data.email,
           profilePicture: response.data.profilePicture,
         });
-        setProfilePictureURL(response.data.profilePicture)
+        setProfilePictureURL(response.data.profilePicture);
       })
       .catch((error) => {
         console.error(error);
@@ -92,10 +119,19 @@ const Profile = () => {
           Authorization: `Bearer ${Cookies.get("userToken")}`,
         },
       });
+      setError(null)
       setIngredientOptions(response.data.ingredientOptions);
+
     } 
     catch (error) {
-      console.error(error);
+      if (error.response && error.response.status === 404) {
+        setError(error.response.data.error)
+        setIngredientName("");
+        setIngredientQuantity("");
+        setIngredientOptions("");
+      } else {
+        console.error(error);
+      }
     }
   };
 
@@ -117,8 +153,6 @@ const Profile = () => {
         }
       );
       setSavedIngredients(response.data.savedIngredients);
-      // setIngredientName("");
-      // setIngredientQuantity("");
     } catch (error) {
       console.error(error);
     }
@@ -130,8 +164,13 @@ const Profile = () => {
 
   const handleAddIngredient = async () => {
     try {
-
       const ingredientName = selectedIngredient;
+
+      if (isNaN(ingredientQuantity) || ingredientQuantity === "") {
+        setShowIngredientModal(false);
+        setQuantityError("Not a valid quantity. Please enter a number.");
+        return;
+      }
 
       const response = await Axios.post(
         API+"/users/profile_ingredient_list",
@@ -145,19 +184,19 @@ const Profile = () => {
             Authorization: `Bearer ${Cookies.get("userToken")}`,
           },
         }
-      );
-      console.log(response.data); 
+      ) 
       // Only fetch ingredients after a successful save
       fetchSavedIngredients();    
-      // empty input fields
+      // empty fields
       setIngredientName("");
       setIngredientQuantity("");
+      setIngredientOptions("");
       // closing Modal
-      console.log("Adding ingredient:", selectedIngredient);
       setShowIngredientModal(false);
     }
     catch (error) {
       console.error(error);
+      setError("Internal Server Error");
     }
   };
 
@@ -204,7 +243,9 @@ const Profile = () => {
 
         if (response){
           getUserData();
+          setProfilePictureURL(response.data.filePath); 
           setShowUploadModal(false);
+          window.location.reload();//refreshes page
         }
       }
     } catch (error) {
@@ -212,8 +253,53 @@ const Profile = () => {
     }
   };
 
+  // Favorite Recipes Section
+
+  const handleDeleteFavRecipe = async (recipe) => {
+    try{
+      await Axios.delete(
+        API+"/users/unbookmark",
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${Cookies.get("userToken")}`,
+          },
+          data: {
+            
+            recipeID: recipe.id,
+          },
+        }
+      );
+      window.location.reload();//refreshes page
+    }
+    catch(error){
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    const fetchFavoriteRecipes = async () => {
+      try {
+        const response = await Axios.get(
+          API + "/users/favorite_recipe",
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${Cookies.get("userToken")}`,
+            },
+          }
+        );
+        setFavoriteRecipes(response.data.favoriteRecipes);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchFavoriteRecipes();
+  }, []);
+  
   return (
-    <div className="Profile-Page">
+    <div className="Profile-Page" style={{backgroundColor: 'tan'}}>
       <Header />
       <div className="top-section">
         <div className="Left-Panel">
@@ -223,15 +309,15 @@ const Profile = () => {
                 <img 
                   className="pic-icon" 
                   src="./images/profile/photo_icon.png" 
-                  alt="Add Photo"
+                  alt="default_pic"
                 />
               </div>
               {profilePictureURL ? ( 
                 <img 
-                className="profile-pic"
-                src={`http://localhost:3000/uploads/${profilePictureURL}`} 
-                alt="Profile"
-              />
+                  className="profile-pic"
+                  src={`http://localhost:3000/uploads/${profilePictureURL}`} 
+                  alt="Profile"
+                />
               ) : (
                 <img 
                   className="default" 
@@ -280,17 +366,56 @@ const Profile = () => {
             <h1> Meal of the Week </h1>
             { recipeOfTheWeek && (
               <>
-                {/* Link */}
-                <img className="r-arrow" src="./images/profile/r_arrow.png" alt="RecipeOftheWeek"/>
+                <img 
+                  className="r-arrow" 
+                  src="./images/profile/r_arrow.png" 
+                  alt="RecipeOftheWeek"  
+                  onClick={() => handleRecipeToSearchBar(recipeOfTheWeek.title)}
+                />
                 {/* Display the picture */}
-                <img className="recipe-img" src={`http://localhost:3000/recipe_images/${recipeOfTheWeek.image}`} alt="Recipe" />
+                <img 
+                  className="recipe-img" 
+                  src={`http://localhost:3000/recipe_images/${recipeOfTheWeek.image}`} 
+                  alt="Recipe" 
+                />
                 {/* <p>{recipeOfTheWeek.title}</p> */}
               </>
             )}
           </div>
         </div>
         <div className="Right-Panel">
-          {/* <h2>FAVORITE RECIPES</h2> */}
+          <div className="favorite-section">
+            <h2>BOOKMARKED RECIPES</h2>
+            <div className="recipe-list">
+              {favoriteRecipes.map((recipe) => (
+                <div key={recipe.id} className="favorite-recipe">
+                  {recipe.image ? (
+                    <img 
+                      className="fav_recipe_image"
+                      src={`${recipe.image}`} 
+                      alt={recipe.title} 
+                      onClick={() => handleRecipeToSearchBar(recipe.title)}
+                    />
+                  ) : ( 
+                    // placeholder image 
+                    <img 
+                     className="fav_recipe_image"
+                      src={`./images/profile/default_food.png`}
+                      alt="Placeholder" 
+                      onClick={() => handleRecipeToSearchBar(recipe.title)}
+                    />
+                  )}
+                  <div className="recipe-info">
+                    <p>{recipe.title}</p>
+                    <label 
+                      className="bookmark_icon" 
+                      onClick={() => handleDeleteFavRecipe(recipe)}>
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
       <div className="middle-section">
@@ -306,18 +431,28 @@ const Profile = () => {
                 value={ingredientName}
                 onChange={(e) => setIngredientName(e.target.value)}
                 placeholder="Enter Ingredient Name"
-              />          
+              />       
               <input
                 className="add-items-input"
                 type="text"
                 value={ingredientQuantity}
-                onChange={(e) => setIngredientQuantity(e.target.value)}
+                onChange={(e) => {
+                  setIngredientQuantity(e.target.value)
+                  setQuantityError("");
+                }}
                 placeholder="Quantity"
               />
             </form>
           </div>
           <div className="bottom-fridge">
             <div className="b-thin-handle"></div>
+            
+            {error && 
+              <div className="error-message">
+                {error}
+              </div>
+            }
+            {quantityError && <div className="error-message">{quantityError}</div>} 
             {ingredientOptions.length > 0 && (
             <ul>
               {ingredientOptions.map((option, index) => (
@@ -329,7 +464,7 @@ const Profile = () => {
             )} 
           </div>
           <button className="save-button" type="button" onClick={fetchIngredientOptions}>
-            Save Ingredient
+            Save
           </button>
           {/* Ingredient Modal */}
           {showIngredientModal && (
@@ -348,7 +483,7 @@ const Profile = () => {
         </div>
         <div className="R-Panel">
           {/* <div class="cold-mist"></div> */}
-          <div className="vapor1">
+          {/* <div className="vapor1">
             {[1, 3, 16, 5, 20, 6, 7, 9, 10, 17, 11, 12, 18, 13, 14, 2, 8, 15, 4, 19].map((index) => (
               <span key={index} style={{ '--i': index }}></span>
             ))}           
@@ -362,7 +497,7 @@ const Profile = () => {
             {[1, 3, 16, 5, 20, 6, 7, 9, 10, 17, 11, 12, 18, 13, 14, 2, 8, 15, 4, 19].map((index) => (
               <span key={index} style={{ '--i': index }}></span>
             ))}
-          </div>
+          </div> */}
           <h1>Your Fridge</h1>
           {/* <div className="underline"></div> */}
           <div className="saved-items">
@@ -372,7 +507,7 @@ const Profile = () => {
                   <li key={index}>
                     <h3>{capitalizeFirstLetter(ingredient.name)}</h3>
                     <h3>Quantity: {ingredient.quantity}</h3>
-                    <button onClick={() => handleDeleteIngredient(ingredient.name)}>
+                    <button id="fridge-button" onClick={() => handleDeleteIngredient(ingredient.name)}>
                       Delete
                     </button>
                   </li>
@@ -386,4 +521,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default withTokenExpirationCheck(Profile);

@@ -17,6 +17,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING, 
       allowNull: true,
     },
+    recipe_of_the_week: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    recipe_of_the_week_timestamp: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   })
 
   Recipe.associate = (models) => {

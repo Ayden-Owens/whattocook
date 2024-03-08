@@ -43,7 +43,7 @@ describe('Register', () => {
         { withCredentials: true }
       );
 
-      expect(mockNavigate).toHaveBeenCalledWith('/Login');
+      expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
 });

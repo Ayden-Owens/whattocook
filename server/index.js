@@ -1,7 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const session = require("express-session")
-const db = require('./models')
+const db = require('./models');
 const dotenv = require('dotenv')
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
@@ -20,10 +20,11 @@ app.use('/uploads/:filename', (req, res) => {
 
 // Serves static images
 app.use('/recipe_images', express.static(path.join(__dirname, 'recipe_images')));
+app.use('/ingredient_images', express.static(path.join(__dirname, 'ingredient_images')));
 
 app.use(express.json())
 app.use(cors({
-    origin: ["http://localhost:3001"],
+    origin: ["http://localhost:3001"],// replace with actual url of production frontend 
     methods: ["GET", "POST", "DELETE"],
     credentials: true
 }))
@@ -42,15 +43,16 @@ app.use(session({
 // Routers
 const userRouter = require('./routes/Users.js')
 app.use('/users', userRouter)
+
 const recipeRouter = require('./routes/Recipe.js')
 app.use('/recipe', recipeRouter)
 
 var PORT = process.env.PORT || 3000
 
-// Serve static files from the React app
+// // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')))
 
-// Handle requests to the root path by sending the React app's index.html
+// // Handle requests to the root path by sending the React app's index.html
 app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 })

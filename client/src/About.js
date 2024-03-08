@@ -2,10 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import withTokenExpirationCheck from "./withTokenExpirationCheck";
 
 function About() {
     return (
-        <div style={{fontFamily:'cursive'}}>
+        <div style={{fontFamily:'cursive', backgroundColor: 'tan'}}>
         <Header/>
             <div style = {{size:'20px'}}>
                 <h1 style = {{size:'30px'}}>About Us</h1>
@@ -25,7 +26,7 @@ function About() {
                 <h3> Antonio Turner is a senior at the University of South Carolina studying computer engineering. His passion for computer engineering stems from his love of robotics and automation. He believes every process can be automated and re-constructed to make life in general better and faster for everyone. His background in DevOps engineering and robotic analysis, as well as his research in societal statistics motivates him to bring real solutions to everyday problems. Using his many leadership experiences, he hopes to bring the world into a new era of automation.</h3>
             </div>
             <div style = {{background: 'ivory', margin:'10px'}}>   
-                <h2 style = {{size: '25px'}}> Adyen Owens</h2>
+                <h2 style = {{size: '25px'}}> Ayden Owens</h2>
                 <h3> Ayden is a senior currently pursuing his degree in Computer Engineering at the University of South Carolina. Ayden's love for STEM and astrophysics shines through in his work and dedication. Beyond his studies, he actively engages in various extracurricular activities, including his involvement in the IEEE club and the SOU Professional Business Fraternity. As a Peer Leader at the UofSC Student Success Center, Ayden demonstrates his genuine passion for helping others, making him an invaluable asset to our team.</h3>
             </div>
             <div style = {{background: 'ivory', margin:'10px'}}>
@@ -36,4 +37,4 @@ function About() {
         </div>
     )
 }
-export default About
+export default withTokenExpirationCheck(About);
