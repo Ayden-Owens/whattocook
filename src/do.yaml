@@ -1,12 +1,9 @@
-name: WhatToCook
-region: nyc
-
 services:
   - name: frontend-service
     github:
       repo: https://github.com/Ayden-Owens/whattocook
       branch: main
-    source_dir: /client
+    source_dir: /src/client
     build_command: npm run build
     routes:
       - path: /build
@@ -17,9 +14,9 @@ services:
     github:
       repo: https://github.com/Ayden-Owens/whattocook
       branch: main
-    source_dir: /server
+    source_dir: /src/server
     build_command: npm install
     run_command: npm start
     instance_count: 1
     routes:
-      - path: /routes
+      - path: /api
