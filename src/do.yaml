@@ -19,4 +19,4 @@ services:
     run_command: npm start
     instance_count: 1
     routes:
-      - path: /api
+      - path: /routes
